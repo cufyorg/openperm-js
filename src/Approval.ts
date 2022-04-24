@@ -1,11 +1,11 @@
 /**
  * A type representing the approval results.
  */
-export type Approval = {
+export interface Approval {
     /**
      * True, if the access is approved. False, otherwise.
      */
-    value: boolean,
+    value: boolean
     /**
      * The error that caused the approval to fail.
      */
