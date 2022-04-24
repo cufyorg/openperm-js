@@ -30,6 +30,64 @@ export type Privilege<R extends Role = Role, A extends Approval = Approval> =
 // Static
 
 /**
+ * Check the given privilege and throw the error if it fails.
+ *
+ * @param privilege the privilege to be checked.
+ * @param role the role to check the privilege for.
+ * @return the role.
+ */
+export async function requirePrivilege<R extends Role = Role, A extends Approval = Approval>(
+    privilege: Privilege<R, A>,
+    role: R
+): Promise<R> {
+    const approval = await checkPrivilege(privilege, role)
+
+    if (!approval.value)
+        throw approval.error
+
+    return role
+}
+
+/**
+ * Check the given privilege.
+ *
+ * @param privilege the privilege to be checked.
+ * @param role the role to check the privilege for.
+ * @return true, if the privilege has approval for the given role.
+ */
+export async function isPrivileged<R extends Role = Role, A extends Approval = Approval>(
+    privilege: Privilege<R, A>,
+    role: R
+): Promise<boolean> {
+    const approval = await checkPrivilege(privilege, role)
+
+    return approval.value
+}
+
+/**
+ * Check the given privilege.
+ *
+ * @param privilege the privilege to be checked.
+ * @param role the role to check the privilege for.
+ * @return an approval object.
+ */
+export async function checkPrivilege<R extends Role = Role, A extends Approval = Approval>(
+    privilege: Privilege<R, A>,
+    role: R
+): Promise<A> {
+    const approvals = await invokePrivilege(privilege, role)
+
+    if (approvals.length === 0)
+        return {value: false} as A
+
+    for (const approval of approvals)
+        if (!approval.value)
+            return approval
+
+    return approvals[0]
+}
+
+/**
  * Evaluate the given privilege.
  *
  * @param privilege the privilege to be evaluated.
