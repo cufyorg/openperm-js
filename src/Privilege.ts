@@ -78,7 +78,7 @@ export async function checkPrivilege<R extends Role = Role, A extends Approval =
     const approvals = await invokePrivilege(privilege, role)
 
     if (approvals.length === 0)
-        return {value: false} as A
+        return {value: false, error: role.error} as A
 
     for (const approval of approvals)
         if (!approval.value)
@@ -145,14 +145,14 @@ export namespace Privilege {
                 const approvals = await invokePrivilege(privilege, role)
 
                 if (approvals.length === 0)
-                    return {value: false} as A
+                    return {value: false, error: role.error} as A
 
                 for (const approval of approvals)
                     if (!approval.value)
                         return approval
             }
 
-            return {value: true} as A
+            return {value: true, error: role.error} as A
         }
     }
 
@@ -177,7 +177,7 @@ export namespace Privilege {
                         return approval
             }
 
-            return {value: false} as A
+            return {value: false, error: role.error} as A
         }
     }
 }

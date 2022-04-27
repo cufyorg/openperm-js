@@ -97,7 +97,7 @@ export async function checkPermit<T = any, R extends Role = Role, A extends Appr
                 return approval
     }
 
-    return {value: true} as A
+    return {value: true, error: roles[0].error} as A
 }
 
 /**
