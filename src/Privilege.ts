@@ -118,3 +118,66 @@ export async function invokePrivilege<R extends Role = Role, A extends Approval 
 
     throw new Error('Invalid Privilege Type')
 }
+
+// Util
+
+/**
+ * Privilege static utilities.
+ */
+export namespace Privilege {
+    /**
+     * Return a privilege that checks the given `privileges`.
+     *
+     * If the privileges array is empty, the returned privilege will always
+     * evaluate to `true`.
+     *
+     * If at least one privilege evaluates to false, the privilege will
+     * evaluate to `false`.
+     *
+     * If at least on privilege doesn't emit an approval, the privilege will
+     * evaluate to `false`.
+     */
+    export function every<R extends Role = Role, A extends Approval = Approval>(
+        ...privileges: Privilege<R, A>[]
+    ): Privilege<R, A> {
+        return async role => {
+            for (const privilege of privileges) {
+                const approvals = await invokePrivilege(privilege, role)
+
+                if (approvals.length === 0)
+                    return {value: false} as A
+
+                for (const approval of approvals)
+                    if (!approval.value)
+                        return approval
+            }
+
+            return {value: true} as A
+        }
+    }
+
+    /**
+     * Return a privilege that checks the given `privileges`.
+     *
+     * If the privileges array is empty, the returned privilege will always
+     * evaluate to `false`.
+     *
+     * If at least one privilege evaluates to true, the privilege will
+     * evaluate to `true`.
+     */
+    export function some<R extends Role = Role, A extends Approval = Approval>(
+        ...privileges: Privilege<R, A>[]
+    ): Privilege<R, A> {
+        return async role => {
+            for (const privilege of privileges) {
+                const approvals = await invokePrivilege(privilege, role)
+
+                for (const approval of approvals)
+                    if (approval.value)
+                        return approval
+            }
+
+            return {value: false} as A
+        }
+    }
+}
