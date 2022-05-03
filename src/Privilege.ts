@@ -126,6 +126,16 @@ export async function invokePrivilege<R extends Role = Role, A extends Approval 
  */
 export namespace Privilege {
     /**
+     * A privilege that always succeed.
+     */
+    export const GRANT: Privilege<any, any> = [role => ({value: true, error: role.error})]
+
+    /**
+     * A privilege that always fails.
+     */
+    export const DENY: Privilege<any, any> = [role => ({value: false, error: role.error})]
+
+    /**
      * Return a privilege that checks the given `privileges`.
      *
      * If the privileges array is empty, the returned privilege will always
@@ -197,5 +207,15 @@ export namespace Privilege {
             table.set(role, approval)
             return approval
         }
+    }
+
+    /**
+     * Return a privilege that invokes the given `privilegeProvider` with a
+     * privilege that redirects to the result of invoking it.
+     */
+    export function withSelf<R extends Role = Role, A extends Approval = Approval>(
+        privilegeProvider: ((self: Privilege<R, A>) => Privilege<R, A>)
+    ): Privilege<R, A> {
+        return _ => [privilegeProvider(arguments.callee as Privilege<R, A>)]
     }
 }
