@@ -180,4 +180,22 @@ export namespace Privilege {
             return {value: false, error: role.error} as A
         }
     }
+
+    /**
+     * Return a privilege that caches resolved roles.
+     */
+    export function cached<R extends Role = Role, A extends Approval = Approval>(
+        privilege: Privilege<R, A>
+    ): Privilege<R, A> {
+        const table: Map<R, A> = new Map<R, A>()
+
+        return async role => {
+            if (table.has(role)) return table.get(role)!
+
+            const approval = await checkPrivilege(privilege, role)
+
+            table.set(role, approval)
+            return approval
+        }
+    }
 }
