@@ -128,12 +128,22 @@ export namespace Privilege {
     /**
      * A privilege that always succeed.
      */
-    export const GRANT: Privilege<any, any> = [role => ({value: true, error: role.error})]
+    export const GRANT: [Privilege<any, any>] = [role => ({value: true, error: role.error})]
 
     /**
      * A privilege that always fails.
      */
-    export const DENY: Privilege<any, any> = [role => ({value: false, error: role.error})]
+    export const DENY: [Privilege<any, any>] = [role => ({value: false, error: role.error})]
+
+    /**
+     * Return a privilege that always succeeds when `success` is true and always
+     * fails otherwise.
+     */
+    export function result(
+        success: boolean
+    ): Privilege<any, any> {
+        return success ? Privilege.GRANT : Privilege.DENY
+    }
 
     /**
      * Return a privilege that checks the given `privileges`.
