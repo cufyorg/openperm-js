@@ -84,7 +84,7 @@ export async function checkPermit<T = any, R extends Role = Role, A extends Appr
     const roles = await invokePermit(permit, target)
 
     if (roles.length === 0)
-        return {value: false} as A
+        return Approval.DENY as A
 
     for (const role of roles) {
         const approvals = await invokePrivilege(privilege, role)

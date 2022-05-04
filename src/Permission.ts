@@ -85,7 +85,7 @@ export async function checkPermission<T = any, R extends Role = Role, A extends 
     const approvals = await invokePermission(permission, privilege, target)
 
     if (approvals.length === 0)
-        return {value: false} as A
+        return Approval.DENY as A
 
     for (const approval of approvals)
         if (!approval.value)
@@ -154,7 +154,7 @@ export namespace Permission {
                 const approvals = await invokePermission(permission, privilege, target)
 
                 if (approvals.length === 0)
-                    return {value: false} as A
+                    return Approval.DENY as A
 
                 for (const approval of approvals)
                     if (!approval.value)
