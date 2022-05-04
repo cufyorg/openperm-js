@@ -150,6 +150,12 @@ export namespace Permission {
         ...permissions: Permission<T, R, A>[]
     ): Permission<T, R, A> {
         return async (privilege, target) => {
+            if (permissions.length === 0)
+                return Approval.GRANT as A
+
+            // the default approval to be returned
+            let approval: A | null = null
+
             for (const permission of permissions) {
                 const approvals = await invokePermission(permission, privilege, target)
 
@@ -159,9 +165,11 @@ export namespace Permission {
                 for (const approval of approvals)
                     if (!approval.value)
                         return approval
+
+                approval ??= approvals[0]
             }
 
-            return {value: true} as A
+            return approval ?? Approval.GRANT as A
         }
     }
 
@@ -178,15 +186,23 @@ export namespace Permission {
         ...permissions: Permission<T, R, A>[]
     ): Permission<T, R, A> {
         return async (privilege, target) => {
+            if (permissions.length === 0)
+                return Approval.DENY as A
+
+            // the default approval to be returned
+            let approval: A | null = null
+
             for (const permission of permissions) {
                 const approvals = await invokePermission(permission, privilege, target)
 
                 for (const approval of approvals)
                     if (approval.value)
                         return approval
+
+                approval ??= approvals[0]
             }
 
-            return {value: false} as A
+            return approval ?? Approval.DENY as A
         }
     }
 
