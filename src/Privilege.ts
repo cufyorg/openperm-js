@@ -226,6 +226,7 @@ export namespace Privilege {
     export function withSelf<R extends Role = Role, A extends Approval = Approval>(
         privilegeProvider: ((self: Privilege<R, A>) => Privilege<R, A>)
     ): Privilege<R, A> {
-        return _ => [privilegeProvider(arguments.callee as Privilege<R, A>)]
+        let self
+        return self = _ => [privilegeProvider(self)]
     }
 }
