@@ -9,6 +9,7 @@
     "target": "es6",
     "strict": true,
     "noImplicitAny": false,
-    "declaration": true
+    "declaration": true,
+    "sourceMap": true
   }
 }
